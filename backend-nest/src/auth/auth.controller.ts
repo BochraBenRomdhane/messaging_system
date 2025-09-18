@@ -26,8 +26,7 @@ export class AuthController {
     res.cookie('token', token, { 
       httpOnly: true, 
       sameSite: 'none', 
-      secure: true,
-      domain: '.vercel.app'
+      secure: true
     });
     return user;
   }
@@ -40,8 +39,7 @@ export class AuthController {
       res.cookie('token', token, { 
         httpOnly: true, 
         sameSite: 'none', 
-        secure: true,
-        domain: '.vercel.app'
+        secure: true
       });
       console.log('✅ Login successful for user:', user.email);
       return user;

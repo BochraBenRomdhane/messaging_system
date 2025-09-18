@@ -4,11 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 
 @WebSocketGateway({ 
   cors: { 
-    origin: [
-      'http://localhost:5173',
-      'https://messaging-system-navy.vercel.app',
-      'https://messaging-system-n0wz.onrender.com'
-    ], 
+    origin: true, // Allow all origins
     credentials: true 
   } 
 })

@@ -8,17 +8,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
   
-  const allowedOrigins = [
-    'http://localhost:5173', // Local development
-    'https://messaging-system-navy.vercel.app', // Your Vercel domain
-    'https://messaging-system-n0wz.onrender.com', // Your Render backend domain
-    process.env.FRONTEND_URL // Environment variable for production
-  ].filter(Boolean); // Remove any undefined values
-  
-  console.log('Allowed CORS origins:', allowedOrigins);
-  
   app.enableCors({ 
-    origin: true, // Allow all origins for testing
+    origin: true, // Allow all origins for production flexibility
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
