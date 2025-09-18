@@ -8,9 +8,9 @@ This guide will help you deploy your messaging system using 100% free services.
 - Git installed
 
 ## 🎯 Architecture Overview
-- **Frontend**: Vercel (Free Forever)
-- **Backend**: Railway (Free $5/month credits)
-- **Database**: Neon (Free 0.5GB)
+- **Frontend**: Vercel (Free subdomain)
+- **Backend**: GitHub Pages + GitHub Actions (Free)
+- **Database**: Supabase (Free 500MB)
 
 ## 📝 Step-by-Step Deployment
 
@@ -37,35 +37,39 @@ This guide will help you deploy your messaging system using 100% free services.
    git push -u origin main
    ```
 
-### Step 2: Set Up Free Database (Neon)
+### Step 2: Set Up Free Database (Supabase)
 
-1. **Go to [Neon.tech](https://neon.tech)**
+1. **Go to [Supabase.com](https://supabase.com)**
 2. **Sign up** with GitHub
 3. **Create new project**:
    - Name: `messaging-system-db`
    - Region: Choose closest to you
-4. **Copy the connection string** (looks like):
+   - Password: Create a strong password
+4. **Get your database URL**:
+   - Go to Settings → Database
+   - Copy the "Connection string" (looks like):
    ```
-   postgresql://username:password@ep-xxx.us-east-1.aws.neon.tech/neondb?sslmode=require
+   postgresql://postgres:[YOUR-PASSWORD]@db.xxx.supabase.co:5432/postgres
    ```
 
-### Step 3: Deploy Backend to Railway
+//postgresql://postgres:[YOUR-PASSWORD]@db.asqkjxvemjrvecxjexaa.supabase.co:5432/postgres
+### Step 3: Deploy Backend to GitHub Pages + Actions
 
-1. **Go to [Railway.app](https://railway.app)**
-2. **Sign up** with GitHub
-3. **Create new project** → "Deploy from GitHub repo"
-4. **Select your repository**
-5. **Configure deployment**:
-   - **Root Directory**: `backend-nest`
-   - **Build Command**: `npm install && npm run build`
-   - **Start Command**: `npm run start:prod`
-6. **Add Environment Variables**:
-   - `DATABASE_URL`: Your Neon connection string
-   - `JWT_SECRET`: `your-super-secret-jwt-key-12345`
-   - `PORT`: `3000`
-   - `NODE_ENV`: `production`
-   - `FRONTEND_URL`: `https://your-app.vercel.app` (we'll update this later)
-7. **Deploy** - Railway will give you a URL like `https://messaging-system-production.railway.app`
+1. **Create GitHub Actions workflow**:
+   - Create `.github/workflows/deploy-backend.yml` in your repository
+   - This will automatically deploy your backend using GitHub Actions
+
+2. **Set up GitHub Pages**:
+   - Go to your repository Settings → Pages
+   - Source: GitHub Actions
+   - This will give you a URL like `https://YOUR_USERNAME.github.io/messaging-system`
+
+3. **Add Environment Variables to GitHub**:
+   - Go to Settings → Secrets and variables → Actions
+   - Add these repository secrets:
+     - `DATABASE_URL`: Your Supabase connection string
+     - `JWT_SECRET`: `your-super-secret-jwt-key-12345`
+     - `FRONTEND_URL`: `https://your-app.vercel.app` (we'll update this later)
 
 ### Step 4: Deploy Frontend to Vercel
 
@@ -78,14 +82,14 @@ This guide will help you deploy your messaging system using 100% free services.
    - **Build Command**: `npm run build`
    - **Output Directory**: `dist`
 5. **Add Environment Variables**:
-   - `VITE_API_URL`: Your Railway backend URL (e.g., `https://messaging-system-production.railway.app`)
+   - `VITE_API_URL`: Your GitHub Pages backend URL (e.g., `https://YOUR_USERNAME.github.io/messaging-system`)
 6. **Deploy**
 
 ### Step 5: Update Backend CORS
 
-1. **Go back to Railway**
-2. **Update the `FRONTEND_URL` environment variable** with your actual Vercel URL
-3. **Redeploy** the backend
+1. **Go back to GitHub repository**
+2. **Update the `FRONTEND_URL` secret** with your actual Vercel URL
+3. **Push a new commit** to trigger redeployment
 
 ### Step 6: Test Your Deployment
 
@@ -108,41 +112,42 @@ The following files have been created for you:
 ## 🌐 Your URLs Will Be:
 
 - **Frontend**: `https://messaging-system.vercel.app`
-- **Backend**: `https://messaging-system-production.railway.app`
-- **Database**: Managed by Neon
+- **Backend**: `https://YOUR_USERNAME.github.io/messaging-system`
+- **Database**: Managed by Supabase
 
 ## 🆓 Why This is 100% Free:
 
 - **Vercel**: Free forever for personal projects
-- **Railway**: $5 free credits monthly (no card needed)
-- **Neon**: Free 0.5GB database (no time limits)
+- **GitHub Pages**: Free hosting for static sites
+- **GitHub Actions**: Free CI/CD with 2000 minutes/month
+- **Supabase**: Free 500MB database (no time limits)
 
 ## 🚨 Important Notes:
 
 1. **Keep your JWT_SECRET secure** - don't share it
 2. **Your database URL contains credentials** - keep it private
-3. **Railway may sleep after inactivity** but wakes up quickly
+3. **GitHub Pages is static hosting** - we'll need to adapt your backend
 4. **All services support automatic deployments** from GitHub
 
 ## 🔄 Automatic Deployments:
 
 Once set up, any push to your main branch will automatically:
 - Deploy frontend to Vercel
-- Deploy backend to Railway
+- Deploy backend to GitHub Pages
 - Keep your database persistent
 
 ## 🆘 Troubleshooting:
 
-- **Backend not connecting**: Check Railway environment variables
+- **Backend not connecting**: Check GitHub Actions secrets
 - **Frontend can't reach backend**: Verify VITE_API_URL in Vercel
-- **Database connection issues**: Check DATABASE_URL in Railway
-- **CORS errors**: Ensure FRONTEND_URL is set correctly in Railway
+- **Database connection issues**: Check DATABASE_URL in GitHub secrets
+- **CORS errors**: Ensure FRONTEND_URL is set correctly in GitHub secrets
 
 ## 📞 Support:
 
 - **Vercel**: [vercel.com/docs](https://vercel.com/docs)
 - **Railway**: [docs.railway.app](https://docs.railway.app)
-- **Neon**: [neon.tech/docs](https://neon.tech/docs)
+- **Supabase**: [supabase.com/docs](https://supabase.com/docs)
 
 ---
 
