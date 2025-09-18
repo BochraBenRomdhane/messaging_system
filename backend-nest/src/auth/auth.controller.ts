@@ -22,7 +22,12 @@ export class AuthController {
   @Post('signup')
   async signup(@Body() body: any, @Res({ passthrough: true }) res: Response) {
     const { user, token } = await this.authService.signup(body);
-    res.cookie('token', token, { httpOnly: true, sameSite: 'lax' });
+    res.cookie('token', token, { 
+      httpOnly: true, 
+      sameSite: 'none', 
+      secure: true,
+      domain: '.vercel.app'
+    });
     return user;
   }
 
@@ -31,7 +36,12 @@ export class AuthController {
     console.log('🔐 Login attempt:', body);
     try {
       const { user, token } = await this.authService.login(body);
-      res.cookie('token', token, { httpOnly: true, sameSite: 'lax' });
+      res.cookie('token', token, { 
+        httpOnly: true, 
+        sameSite: 'none', 
+        secure: true,
+        domain: '.vercel.app'
+      });
       console.log('✅ Login successful for user:', user.email);
       return user;
     } catch (error) {

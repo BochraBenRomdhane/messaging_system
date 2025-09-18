@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { io, Socket } from "socket.io-client";
 import { AuthState, User } from "../types";
 
-const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:3000" : "/";
+const BASE_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || (import.meta.env.MODE === "development" ? "http://localhost:3000" : "https://messaging-system-n0wz.onrender.com");
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   authUser: null,

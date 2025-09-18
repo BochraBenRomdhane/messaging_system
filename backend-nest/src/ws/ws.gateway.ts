@@ -2,7 +2,16 @@ import { OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WebSocketSe
 import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 
-@WebSocketGateway({ cors: { origin: ['http://localhost:5173'], credentials: true } })
+@WebSocketGateway({ 
+  cors: { 
+    origin: [
+      'http://localhost:5173',
+      'https://messaging-system-navy.vercel.app',
+      'https://messaging-system-n0wz.onrender.com'
+    ], 
+    credentials: true 
+  } 
+})
 export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
