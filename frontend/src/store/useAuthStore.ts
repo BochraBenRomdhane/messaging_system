@@ -21,6 +21,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       get().connectSocket();
     } catch (error) {
       console.log("Error in authCheck:", error);
+      // Clear localStorage token if auth check fails
+      localStorage.removeItem('authToken');
       set({ authUser: null });
     } finally {
       set({ isCheckingAuth: false });
@@ -32,6 +34,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       const res = await axiosInstance.post("/auth/signup", data);
       set({ authUser: res.data });
+
+      // Store token in localStorage as fallback for mobile browsers
+      if (res.data.token) {
+        localStorage.setItem('authToken', res.data.token);
+      }
 
       toast.success("Account created successfully!");
       get().connectSocket();
@@ -48,6 +55,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const res = await axiosInstance.post("/auth/login", data);
       set({ authUser: res.data });
 
+      // Store token in localStorage as fallback for mobile browsers
+      if (res.data.token) {
+        localStorage.setItem('authToken', res.data.token);
+      }
+
       toast.success("Logged in successfully");
 
       get().connectSocket();
@@ -62,6 +74,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       await axiosInstance.post("/auth/logout");
       set({ authUser: null });
+      localStorage.removeItem('authToken'); // Clear localStorage token
       toast.success("Logged out successfully");
       get().disconnectSocket();
     } catch (error: any) {

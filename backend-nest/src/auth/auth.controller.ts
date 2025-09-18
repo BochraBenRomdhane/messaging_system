@@ -25,10 +25,11 @@ export class AuthController {
     const { user, token } = await this.authService.signup(body);
     res.cookie('token', token, { 
       httpOnly: true, 
-      sameSite: 'none', 
-      secure: true
+      sameSite: 'lax', 
+      secure: true,
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
     });
-    return user;
+    return { ...user, token }; // Include token in response for mobile fallback
   }
 
   @Post('login')
@@ -38,11 +39,12 @@ export class AuthController {
       const { user, token } = await this.authService.login(body);
       res.cookie('token', token, { 
         httpOnly: true, 
-        sameSite: 'none', 
-        secure: true
+        sameSite: 'lax', 
+        secure: true,
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
       });
       console.log('✅ Login successful for user:', user.email);
-      return user;
+      return { ...user, token }; // Include token in response for mobile fallback
     } catch (error) {
       console.error('❌ Login failed:', error.message);
       throw error;
