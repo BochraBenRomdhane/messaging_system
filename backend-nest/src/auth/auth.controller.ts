@@ -7,6 +7,12 @@ import { JwtAuthGuard } from './jwtGuard';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Get('test')
+  test() {
+    console.log('🧪 Auth test endpoint called');
+    return { message: 'Auth controller is working!' };
+  }
+
   @Get('check')
   @UseGuards(JwtAuthGuard)
   check(@Req() req: Request) {
@@ -22,9 +28,16 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() body: any, @Res({ passthrough: true }) res: Response) {
-    const { user, token } = await this.authService.login(body);
-    res.cookie('token', token, { httpOnly: true, sameSite: 'lax' });
-    return user;
+    console.log('🔐 Login attempt:', body);
+    try {
+      const { user, token } = await this.authService.login(body);
+      res.cookie('token', token, { httpOnly: true, sameSite: 'lax' });
+      console.log('✅ Login successful for user:', user.email);
+      return user;
+    } catch (error) {
+      console.error('❌ Login failed:', error.message);
+      throw error;
+    }
   }
 
   @Post('logout')
