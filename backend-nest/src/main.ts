@@ -7,7 +7,19 @@ import { json, urlencoded } from 'express';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
-  app.enableCors({ origin: ['http://localhost:5173'], credentials: true });
+  
+  const allowedOrigins = [
+    'http://localhost:5173', // Local development
+    'https://messaging-system-navy.vercel.app', // Your Vercel domain
+    process.env.FRONTEND_URL // Environment variable for production
+  ].filter(Boolean); // Remove any undefined values
+  
+  console.log('Allowed CORS origins:', allowedOrigins);
+  
+  app.enableCors({ 
+    origin: allowedOrigins,
+    credentials: true 
+  });
   
   // Increase body size limits for file uploads
   app.use(json({ limit: '50mb' }));
