@@ -16,6 +16,7 @@ export class AuthController {
   @Get('check')
   @UseGuards(JwtAuthGuard)
   check(@Req() req: Request) {
+    console.log('🔍 Auth check called, user:', req.user);
     return req.user;
   }
 
