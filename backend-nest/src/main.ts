@@ -11,6 +11,7 @@ async function bootstrap() {
   const allowedOrigins = [
     'http://localhost:5173', // Local development
     'https://messaging-system-navy.vercel.app', // Your Vercel domain
+    'https://messaging-system-n0wz.onrender.com', // Your Render backend domain
     process.env.FRONTEND_URL // Environment variable for production
   ].filter(Boolean); // Remove any undefined values
   
