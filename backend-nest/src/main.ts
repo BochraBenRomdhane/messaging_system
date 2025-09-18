@@ -17,8 +17,10 @@ async function bootstrap() {
   console.log('Allowed CORS origins:', allowedOrigins);
   
   app.enableCors({ 
-    origin: allowedOrigins,
-    credentials: true 
+    origin: true, // Allow all origins for testing
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
   });
   
   // Increase body size limits for file uploads
