@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Post, Put, Req, Res, UseGuards } from '@nestjs/common';
-import type { Response, Request } from 'express';
+import { Body, Controller, Get, Post, Put, Req, UseGuards } from '@nestjs/common';
+import type { Request } from 'express';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwtGuard';
 
@@ -21,30 +21,18 @@ export class AuthController {
   }
 
   @Post('signup')
-  async signup(@Body() body: any, @Res({ passthrough: true }) res: Response) {
+  async signup(@Body() body: any) {
     const { user, token } = await this.authService.signup(body);
-    res.cookie('token', token, { 
-      httpOnly: true, 
-      sameSite: 'lax', 
-      secure: true,
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    });
-    return { ...user, token }; // Include token in response for mobile fallback
+    return { ...user, token }; // Return token for localStorage storage
   }
 
   @Post('login')
-  async login(@Body() body: any, @Res({ passthrough: true }) res: Response) {
+  async login(@Body() body: any) {
     console.log('🔐 Login attempt:', body);
     try {
       const { user, token } = await this.authService.login(body);
-      res.cookie('token', token, { 
-        httpOnly: true, 
-        sameSite: 'lax', 
-        secure: true,
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
-      });
       console.log('✅ Login successful for user:', user.email);
-      return { ...user, token }; // Include token in response for mobile fallback
+      return { ...user, token }; // Return token for localStorage storage
     } catch (error) {
       console.error('❌ Login failed:', error.message);
       throw error;
@@ -52,8 +40,7 @@ export class AuthController {
   }
 
   @Post('logout')
-  async logout(@Res({ passthrough: true }) res: Response) {
-    res.clearCookie('token');
+  async logout() {
     return { message: 'Logged out' };
   }
 

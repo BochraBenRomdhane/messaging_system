@@ -15,12 +15,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   onlineUsers: [],
 
   checkAuth: async () => {
+    console.log('🔍 Checking authentication...');
     try {
       const res = await axiosInstance.get("/auth/check");
+      console.log('✅ Auth check successful:', res.data);
       set({ authUser: res.data });
       get().connectSocket();
-    } catch (error) {
-      console.log("Error in authCheck:", error);
+    } catch (error: any) {
+      console.log("❌ Error in authCheck:", error.response?.status, error.message);
       // Clear localStorage token if auth check fails
       localStorage.removeItem('authToken');
       set({ authUser: null });
@@ -35,9 +37,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const res = await axiosInstance.post("/auth/signup", data);
       set({ authUser: res.data });
 
-      // Store token in localStorage as fallback for mobile browsers
+      // Store token in localStorage
       if (res.data.token) {
         localStorage.setItem('authToken', res.data.token);
+        console.log('💾 Token stored in localStorage:', res.data.token.substring(0, 20) + '...');
       }
 
       toast.success("Account created successfully!");
@@ -51,19 +54,25 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   login: async (data: { email: string; password: string }) => {
     set({ isLoggingIn: true });
+    console.log('🔐 Attempting login for:', data.email);
     try {
       const res = await axiosInstance.post("/auth/login", data);
+      console.log('✅ Login successful:', res.data);
       set({ authUser: res.data });
 
-      // Store token in localStorage as fallback for mobile browsers
+      // Store token in localStorage
       if (res.data.token) {
         localStorage.setItem('authToken', res.data.token);
+        console.log('💾 Token stored in localStorage:', res.data.token.substring(0, 20) + '...');
+      } else {
+        console.log('❌ No token received in login response');
       }
 
       toast.success("Logged in successfully");
 
       get().connectSocket();
     } catch (error: any) {
+      console.log('❌ Login failed:', error.response?.data?.message || error.message);
       toast.error(error.response?.data?.message || "Login failed");
     } finally {
       set({ isLoggingIn: false });
@@ -98,8 +107,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const { authUser } = get();
     if (!authUser || get().socket?.connected) return;
 
+    const token = localStorage.getItem('authToken');
     const socket = io(BASE_URL, {
-      withCredentials: true, // this ensures cookies are sent with the connection
+      withCredentials: false, // Always disable credentials since we're using localStorage
+      auth: {
+        token: token // Send token in auth object
+      }
     });
 
     socket.connect();

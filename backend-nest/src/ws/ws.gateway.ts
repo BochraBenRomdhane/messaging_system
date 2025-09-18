@@ -5,7 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 @WebSocketGateway({ 
   cors: { 
     origin: true, // Allow all origins
-    credentials: true 
+    credentials: false // Disable credentials since we're using localStorage
   } 
 })
 export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -37,9 +37,23 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private extractUserIdFromClient(client: Socket): string | null {
     try {
-      const cookie = client.handshake.headers?.cookie || '';
-      const token = cookie.split(';').map((c) => c.trim()).find((c) => c.startsWith('token='))?.split('=')[1];
+      // Primary: Try to get token from auth object (localStorage approach)
+      let token = (client.handshake as any).auth?.token;
+      
+      // Fallback: Try Authorization header
+      if (!token) {
+        const authHeader = client.handshake.headers?.authorization || '';
+        token = authHeader.replace('Bearer ', '');
+      }
+      
+      // Legacy fallback: Try to get from cookies (for backward compatibility)
+      if (!token) {
+        const cookie = client.handshake.headers?.cookie || '';
+        token = cookie.split(';').map((c) => c.trim()).find((c) => c.startsWith('token='))?.split('=')[1];
+      }
+      
       if (!token) return null;
+      
       const payload = this.jwtService.verify(token, { secret: process.env.JWT_SECRET });
       return payload?.sub ? String(payload.sub) : null;
     } catch (e) {
